@@ -63,6 +63,19 @@ knitr::kable(prior, digits = 3)
 ## ----bayes_probabilities_prior, echo = FALSE-----------------------------
 knitr::kable(addmargins(est_multinom(aspirin, prior = prior)), digits = 3)
 
+## ----bf_indepen_BF-------------------------------------------------------
+bf <- LearnBayes::ctable(aspirin, matrix(rep(1, 4), 2)) # 1793
+BCDA:::interpret_bf(bf)
+
+## ----bf_indepen----------------------------------------------------------
+test_independence(aspirin)
+
+## ----log_linear----------------------------------------------------------
+library(conting) # for summary.bcct()
+set.seed(0)
+fit <- log_linear(aspirin, c('drug', 'attack'))
+summary(fit) # from the 'conting' package
+
 ## ----beta_binom_stan_fit_example, message = FALSE------------------------
 set.seed(0)
 fit <- beta_binom(aspirin)

@@ -116,6 +116,32 @@ est_multinom(aspirin, prior = prior)
 knitr::kable(addmargins(est_multinom(aspirin, prior = prior)), digits = 3)
 ```
 
+### Tests of Independence
+
+As before, we have a null hypothesis that outcome is independent of group. This time, we are going to use the Bayes factor (computed with the **LearnBayes** package) and interpret it using Kass and Raftery's (1995) suggestion.
+
+```{r bf_indepen_BF}
+bf <- LearnBayes::ctable(aspirin, matrix(rep(1, 4), 2)) # 1793
+BCDA:::interpret_bf(bf)
+```
+
+```{r bf_indepen}
+test_independence(aspirin)
+```
+
+Another way to do this is to fit a log-linear model to the counts and look at the interaction. This requires the **conting** package.
+
+```{r log_linear}
+library(conting) # for summary.bcct()
+set.seed(0)
+fit <- log_linear(aspirin, c('drug', 'attack'))
+summary(fit) # from the 'conting' package
+```
+
+Under the $\chi^2$ discrepancy statistic, the Bayesian p-value of 0.51 does not indicate an inadequate model meaning that predictions of the cell counts are consistent with the observed cell counts.
+
+Positive posterior mean -- 0.1514, 95% C.I. (0.99, 0.22) -- of the interaction parameter indicates that a physician taking aspirin has an increased probability of not having an attack.
+
 ### Strength and Direction of Association
 
 We assume an independent Binomial model with independent Beta priors on the probability parameter. For each group $i = 1, 2$ (aspirin and placebo): $$X_i \sim \text{Binom}(N_i, \pi_i),~\text{and}\\ \pi_i \sim \text{Beta}(\alpha_i, \beta_i).$$

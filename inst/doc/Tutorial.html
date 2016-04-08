@@ -272,6 +272,47 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </tr>
 </tbody>
 </table>
+<div id="tests-of-independence" class="section level3">
+<h3>Tests of Independence</h3>
+<p>As before, we have a null hypothesis that outcome is independent of group. This time, we are going to use the Bayes factor (computed with the <strong>LearnBayes</strong> package) and interpret it using Kass and Raftery’s (1995) suggestion.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bf &lt;-<span class="st"> </span>LearnBayes::<span class="kw">ctable</span>(aspirin, <span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="dv">1</span>, <span class="dv">4</span>), <span class="dv">2</span>)) <span class="co"># 1793</span>
+BCDA:::<span class="kw">interpret_bf</span>(bf)</code></pre></div>
+<pre><code>## [1] &quot;Very strong evidence against H0.&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">test_independence</span>(aspirin)</code></pre></div>
+<p>Another way to do this is to fit a log-linear model to the counts and look at the interaction. This requires the <strong>conting</strong> package.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(conting) <span class="co"># for summary.bcct()</span>
+<span class="kw">set.seed</span>(<span class="dv">0</span>)
+fit &lt;-<span class="st"> </span><span class="kw">log_linear</span>(aspirin, <span class="kw">c</span>(<span class="st">'drug'</span>, <span class="st">'attack'</span>))
+<span class="kw">summary</span>(fit) <span class="co"># from the 'conting' package</span></code></pre></div>
+<pre><code>## Posterior summary statistics of log-linear parameters:
+##               post_prob post_mean post_var lower_lim upper_lim
+## (Intercept)           1     7.118 0.000898    7.0614    7.1809
+## drug1                 1    -0.147 0.000890   -0.2114   -0.0942
+## attack1               1     2.177 0.000909    2.1064    2.2299
+## drug1:attack1         1     0.151 0.000885    0.0988    0.2160
+## NB: lower_lim and upper_lim refer to the lower and upper values of the
+## 95 % highest posterior density intervals, respectively
+## 
+## Posterior model probabilities:
+##   prob model_formula               
+## 1 1    ~drug + attack + drug:attack
+## 
+## Total number of models visited =  1 
+## 
+## Under the X2 statistic 
+## 
+## Summary statistics for T_pred 
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   0.019   1.870   3.360   3.970   5.400  19.600 
+## 
+## Summary statistics for T_obs 
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   0.002   1.810   3.440   3.960   5.410  17.600 
+## 
+## Bayesian p-value =  0.505</code></pre>
+<p>Under the <span class="math inline">\(\chi^2\)</span> discrepancy statistic, the Bayesian p-value of 0.51 does not indicate an inadequate model meaning that predictions of the cell counts are consistent with the observed cell counts.</p>
+<p>Positive posterior mean – 0.1514, 95% C.I. (0.99, 0.22) – of the interaction parameter indicates that a physician taking aspirin has an increased probability of not having an attack.</p>
+</div>
 <div id="strength-and-direction-of-association" class="section level3">
 <h3>Strength and Direction of Association</h3>
 <p>We assume an independent Binomial model with independent Beta priors on the probability parameter. For each group <span class="math inline">\(i = 1, 2\)</span> (aspirin and placebo): <span class="math display">\[X_i \sim \text{Binom}(N_i, \pi_i),~\text{and}\\ \pi_i \sim \text{Beta}(\alpha_i, \beta_i).\]</span></p>

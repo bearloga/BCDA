@@ -8,6 +8,7 @@ Use:
   - `print()`, `plot()`, and `summary()` to view the results
   - `update()` if you have additional data
 - `est_multinom()` for estimating multinomial cell probabilities
+- `test_indepen()` and `log_linear()` for assessing independence
 
 For more information, see the Tutorial vignette.
 
