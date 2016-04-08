@@ -6,7 +6,7 @@ Authors@R: c(
     person("Mikhail", "Popov", email = "mpopov@wikimedia.org", role = c("cre", "aut")),
     person("Wikimedia Foundation", role = "cph"))
 Description: A toolkit for Bayesian analysis of 2x2 categorical data, such as
-    results of A/B tests (split-case experiments).
+    results of A/B tests.
 License: MIT + file LICENSE
 LazyData: TRUE
 Depends:
