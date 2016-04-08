@@ -11,6 +11,13 @@ Use:
 
 For more information, see the Tutorial vignette.
 
+## Installing
+
+```R
+install.packages("devtools")
+devtools::install_github("bearloga/BCDA")
+```
+
 ## Updating the posterior
 
 In Bayesian statistics, we can reuse a previously computed posterior as a prior if we have additional data, allowing us to update the parameter estimates as new data becomes available. Suppose we collect 40 observations from 2 groups (20 per group) on the first day of the A/B test, and 10 observations per day for the next 2 weeks. Here we see what happens when we update the posterior with additional data on a daily basis:
