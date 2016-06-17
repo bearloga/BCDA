@@ -4,7 +4,7 @@
 \alias{plot.beta_binomial_fit}
 \title{Visualize posterior draws from a fitted Beta-Binomial model}
 \usage{
-\method{plot}{beta_binomial_fit}(x, interval_type = c("quantile", "HPD"), ...)
+\method{plot}{beta_binomial_fit}(x, interval_type = c("quantile", "HPD"))
 }
 \arguments{
 \item{x}{An object of class "beta_binomial_fit".}

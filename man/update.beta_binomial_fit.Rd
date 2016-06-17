@@ -11,7 +11,8 @@
 
 \item{x}{A numeric vector of success counts OR a 2x2 table or matrix.}
 
-\item{n}{A numeric vector of totals. (Optional if x is a table or matrix.)}
+\item{n}{A numeric vector of totals. (Optional if \code{x} is a table or
+matrix.)}
 
 \item{sims}{Number of draws (simulations) to make from the posterior
 distributions.}
@@ -23,5 +24,15 @@ An S3 object of class "beta_binomial_fit".
 Uses the previously computed Beta posterior as prior to compute
   a new Beta posterior, which can subsequently be updated as even more data
   becomes available.
+}
+\examples{
+\dontrun{
+data <- matrix(c(200, 150, 250, 300), nrow = 2, byrow = TRUE)
+colnames(data) <- c('Safe' ,'Dangerous')
+rownames(data) <- c('Animals', 'Plants')
+
+fit <- beta_binom(data)
+fit <- update(fit, x = c(100, 200), n = c(400, 600))
+}
 }
 

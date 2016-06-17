@@ -25,3 +25,24 @@ check_inputs <- function(x, n) {
   }
   return(data)
 }
+
+format_confint <- function(est, ci = NULL, digits = 2, units = "") {
+  if (units == "%") {
+    units <- paste0(units, units)
+  }
+  type <- switch(typeof(est), "character" = "s", "double" = "f", "integer" = "i")
+  x <- sprintf(paste0("%", ifelse(type == "character", "s", paste0(".", digits, type)), units), est)
+  if (!is.null(ci)) {
+    y <- sprintf(paste0("%", ifelse(type == "character", "s", paste0(".", digits, type)), units), ci[1])
+    z <- sprintf(paste0("%", ifelse(type == "character", "s", paste0(".", digits, type)), units), ci[2])
+    return(paste0(x, " (", y, ", ", z, ")"))
+  }
+  return(x)
+}
+
+if_else <- function(test, yes, no) {
+  if (test) {
+    return(yes)
+  }
+  return(no)
+}

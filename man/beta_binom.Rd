@@ -4,7 +4,7 @@
 \alias{beta_binom}
 \title{Binomial Model with Beta Priors}
 \usage{
-beta_binom(x, n = NULL, prior = c(a = 1, b = 1, c = 1, d = 1),
+beta_binom(x, n = NULL, prior = c(a = 0.5, b = 0.5, c = 0.5, d = 0.5),
   n_sims = 10000)
 }
 \arguments{
@@ -18,7 +18,8 @@ beta_binom(x, n = NULL, prior = c(a = 1, b = 1, c = 1, d = 1),
 distributions.}
 }
 \value{
-An S3 object of class "beta_binomial_fit".
+An S3 object of class "beta_binomial_fit". It has the following
+  properties: posterior_simulations, posterior_parameters, successes, totals
 }
 \description{
 
@@ -26,8 +27,8 @@ An S3 object of class "beta_binomial_fit".
 \details{
 The model assumes
   \deqn{x_i ~ Binomial(n_i, p_i); p_1 ~ Beta(a, b); p_2 ~ Beta(c, d)}
-  for \eqn{i = 1, 2}. The default is \code{a = b = c = d = 1} which
-  corresponds to a \eqn{Uniform(0, 1)} prior on \eqn{p_1} and \eqn{p_2}.
+  for \eqn{i = 1, 2}. The default is \code{a = b = c = d = 1/2} which
+  corresponds to a Jeffreys prior on \eqn{p_1} and \eqn{p_2}.
 }
 \examples{
 \dontrun{
@@ -35,7 +36,7 @@ data <- matrix(c(200, 150, 250, 300), nrow = 2, byrow = TRUE)
 colnames(data) <- c('Safe' ,'Dangerous')
 rownames(data) <- c('Animals', 'Plants')
 
-beta_binom(x = data[, 'Safe'], n = margin.table(data, 1))
+beta_binom(data)
 
 beta_binom(x = c(200, 250), n = c(350, 550))
 }
