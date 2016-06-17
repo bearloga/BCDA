@@ -164,8 +164,9 @@ coda package to be installed. Defaulting to interval_type = "quantile"')
 #'   \describe{
 #'     \item{Group 1}{The total count of trials in group 1.}
 #'     \item{Group 2}{The total count of trials in group 2.}
-#'     \item{Pr(Success) of Group 1}{Point estimate of the probability of success in group 1.}
-#'     \item{Pr(Success) of Group 2}{Point estimate of the probability of success in group 2.}
+#'     \item{Pr(Success) in Group 1}{Point estimate of the probability of success in group 1.}
+#'     \item{Pr(Success) in Group 2}{Point estimate of the probability of success in group 2.}
+#'     \item{Difference}{Pr(Success) in Group 1 - Pr(Success) in Group 2}
 #'     \item{Relative Risk}{How likely trials in group 1 are to succeed relative to group 2.}
 #'     \item{Odds Ratio}{The ratio of the odds of success in group 1 vs odds of success in group 2.}
 #'   }
@@ -206,6 +207,11 @@ present_bbfit <- function(object, conf_interval = TRUE, conf_level = 0.95, inter
                                                    100 * posterior_summaries["p2", c("conf.low", "conf.high")],
                                                    NULL),
                                            digits = digits_, units = "%"),
+                       pd = format_confint(100 * posterior_summaries["prop_diff", "estimate"],
+                                           if_else(conf_interval,
+                                                   100 * posterior_summaries["prop_diff", c("conf.low", "conf.high")],
+                                                   NULL),
+                                           digits = digits_, units = "%"),
                        rr = format_confint(posterior_summaries["relative_risk", "estimate"],
                                            if_else(conf_interval,
                                                    100 * posterior_summaries["relative_risk", c("conf.low", "conf.high")],
@@ -216,6 +222,6 @@ present_bbfit <- function(object, conf_interval = TRUE, conf_level = 0.95, inter
                                                    100 * posterior_summaries["odds_ratio", c("conf.low", "conf.high")],
                                                    NULL),
                                            digits = digits_))
-  names(output) <- c("Group 1", "Group 2", "Pr(Success) of Group 1", "Pr(Success) of Group 2", "Relative Risk", "Odds Ratio")
+  names(output) <- c("Group 1", "Group 2", "Pr(Success) of Group 1", "Pr(Success) of Group 2", "Difference", "Relative Risk", "Odds Ratio")
   return(knitr::kable(output, ...))
 }

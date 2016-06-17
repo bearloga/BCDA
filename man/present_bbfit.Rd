@@ -25,8 +25,9 @@ A character vector formatted as Markdown, HTML, or LaTeX. The table
   \describe{
     \item{Group 1}{The total count of trials in group 1.}
     \item{Group 2}{The total count of trials in group 2.}
-    \item{Pr(Success) of Group 1}{Point estimate of the probability of success in group 1.}
-    \item{Pr(Success) of Group 2}{Point estimate of the probability of success in group 2.}
+    \item{Pr(Success) in Group 1}{Point estimate of the probability of success in group 1.}
+    \item{Pr(Success) in Group 2}{Point estimate of the probability of success in group 2.}
+    \item{Difference}{Pr(Success) in Group 1 - Pr(Success) in Group 2}
     \item{Relative Risk}{How likely trials in group 1 are to succeed relative to group 2.}
     \item{Odds Ratio}{The ratio of the odds of success in group 1 vs odds of success in group 2.}
   }
