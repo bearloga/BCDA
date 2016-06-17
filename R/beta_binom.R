@@ -214,12 +214,12 @@ present_bbfit <- function(object, conf_interval = TRUE, conf_level = 0.95, inter
                                            digits = digits_, units = "%"),
                        rr = format_confint(posterior_summaries["relative_risk", "estimate"],
                                            if_else(conf_interval,
-                                                   100 * posterior_summaries["relative_risk", c("conf.low", "conf.high")],
+                                                   posterior_summaries["relative_risk", c("conf.low", "conf.high")],
                                                    NULL),
                                            digits = digits_),
                        or = format_confint(posterior_summaries["odds_ratio", "estimate"],
                                            if_else(conf_interval,
-                                                   100 * posterior_summaries["odds_ratio", c("conf.low", "conf.high")],
+                                                   posterior_summaries["odds_ratio", c("conf.low", "conf.high")],
                                                    NULL),
                                            digits = digits_))
   names(output) <- c("Group 1", "Group 2", "Pr(Success) in Group 1", "Pr(Success) in Group 2", "Difference", "Relative Risk", "Odds Ratio")

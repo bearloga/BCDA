@@ -68,9 +68,9 @@ This package includes a function `present_bbfit()` that creates a nicely formatt
 present_bbfit(fit, digits = 2)
 ```
 
-| Group 1| Group 2|Pr(Success) in Group 1  |Pr(Success) in Group 2  |Difference             |Relative Risk         |Odds Ratio            |
-|-------:|-------:|:-----------------------|:-----------------------|:----------------------|:---------------------|:---------------------|
-|     350|     550|57.12% (51.88%, 62.29%) |45.48% (41.38%, 49.63%) |11.64% (4.96%, 18.30%) |1.26 (110.22, 142.98) |1.61 (121.97, 210.16) |
+| Group 1| Group 2|Pr(Success) in Group 1  |Pr(Success) in Group 2  |Difference             |Relative Risk     |Odds Ratio        |
+|-------:|-------:|:-----------------------|:-----------------------|:----------------------|:-----------------|:-----------------|
+|     350|     550|57.12% (51.88%, 62.29%) |45.48% (41.38%, 49.63%) |11.64% (4.96%, 18.30%) |1.26 (1.10, 1.43) |1.61 (1.22, 2.10) |
 
 The point estimates include credible intervals by default but these can be turned off:
 
@@ -88,9 +88,9 @@ Since the underlying code uses `summary()` to compute the summaries, we can spec
 present_bbfit(fit, conf_level = 0.8, interval_type = "HPD", digits = 2)
 ```
 
-| Group 1| Group 2|Pr(Success) in Group 1  |Pr(Success) in Group 2  |Difference             |Relative Risk         |Odds Ratio            |
-|-------:|-------:|:-----------------------|:-----------------------|:----------------------|:---------------------|:---------------------|
-|     350|     550|57.12% (53.68%, 60.50%) |45.48% (42.74%, 48.10%) |11.64% (7.22%, 15.92%) |1.26 (115.01, 136.11) |1.61 (130.37, 186.55) |
+| Group 1| Group 2|Pr(Success) in Group 1  |Pr(Success) in Group 2  |Difference             |Relative Risk     |Odds Ratio        |
+|-------:|-------:|:-----------------------|:-----------------------|:----------------------|:-----------------|:-----------------|
+|     350|     550|57.12% (53.68%, 60.50%) |45.48% (42.74%, 48.10%) |11.64% (7.22%, 15.92%) |1.26 (1.15, 1.36) |1.61 (1.30, 1.87) |
 
 ## Updating the posterior
 
@@ -105,9 +105,9 @@ fit <- update(fit, x = c(100, 200), n = c(400, 600))
 present_bbfit(fit, digits = 2)
 ```
 
-| Group 1| Group 2|Pr(Success) in Group 1  |Pr(Success) in Group 2  |Difference            |Relative Risk        |Odds Ratio           |
-|-------:|-------:|:-----------------------|:-----------------------|:---------------------|:--------------------|:--------------------|
-|     750|    1150|39.96% (36.45%, 43.24%) |39.17% (36.23%, 42.01%) |0.78% (-3.73%, 5.08%) |1.02 (90.82, 113.38) |1.04 (85.45, 123.56) |
+| Group 1| Group 2|Pr(Success) in Group 1  |Pr(Success) in Group 2  |Difference            |Relative Risk     |Odds Ratio        |
+|-------:|-------:|:-----------------------|:-----------------------|:---------------------|:-----------------|:-----------------|
+|     750|    1150|39.96% (36.45%, 43.24%) |39.17% (36.23%, 42.01%) |0.78% (-3.73%, 5.08%) |1.02 (0.91, 1.13) |1.04 (0.85, 1.24) |
 
 ## See also
 
