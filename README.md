@@ -62,7 +62,7 @@ plot(fit)
 
 ## Tabular presentation of the results
 
-This package includes a function `present_bbfit()` that creates a nicely formatted table of results from fitting a `beta_bimom()` model:
+This package includes a function `present_bbfit()` that creates a nicely formatted table of results from fitting a `beta_binom()` model:
 
 ```R
 present_bbfit(fit, digits = 2)
