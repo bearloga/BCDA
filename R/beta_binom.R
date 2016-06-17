@@ -222,6 +222,6 @@ present_bbfit <- function(object, conf_interval = TRUE, conf_level = 0.95, inter
                                                    100 * posterior_summaries["odds_ratio", c("conf.low", "conf.high")],
                                                    NULL),
                                            digits = digits_))
-  names(output) <- c("Group 1", "Group 2", "Pr(Success) of Group 1", "Pr(Success) of Group 2", "Difference", "Relative Risk", "Odds Ratio")
+  names(output) <- c("Group 1", "Group 2", "Pr(Success) in Group 1", "Pr(Success) in Group 2", "Difference", "Relative Risk", "Odds Ratio")
   return(knitr::kable(output, ...))
 }
