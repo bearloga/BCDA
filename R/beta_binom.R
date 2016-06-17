@@ -10,8 +10,8 @@
 #' @return An S3 object of class "beta_binomial_fit".
 #' @details The model assumes
 #'   \deqn{x_i ~ Binomial(n_i, p_i); p_1 ~ Beta(a, b); p_2 ~ Beta(c, d)}
-#'   for \eqn{i = 1, 2}. The default is \code{a = b = c = d = 1} which
-#'   corresponds to a \eqn{Uniform(0, 1)} prior on \eqn{p_1} and \eqn{p_2}.
+#'   for \eqn{i = 1, 2}. The default is \code{a = b = c = d = 1/2} which
+#'   corresponds to a Jeffreys prior on \eqn{p_1} and \eqn{p_2}.
 #'
 #' @examples \dontrun{
 #' data <- matrix(c(200, 150, 250, 300), nrow = 2, byrow = TRUE)
@@ -24,7 +24,7 @@
 #' }
 #' @export
 
-beta_binom <- function(x, n = NULL, prior = c(a = 1, b = 1, c = 1, d = 1), n_sims = 1e4) {
+beta_binom <- function(x, n = NULL, prior = c(a = 0.5, b = 0.5, c = 0.5, d = 0.5), n_sims = 1e4) {
   data <- check_inputs(x, n); x <- unname(data[, 1]); n <- as.numeric(unname(margin.table(data, 1)))
   new_a <- unname(x[1] + prior['a']); new_b <- unname(n[1] - x[1] + prior['b'])
   new_c <- unname(x[2] + prior['c']); new_d <- unname(n[2] - x[2] + prior['d'])
