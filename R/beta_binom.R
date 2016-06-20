@@ -153,7 +153,8 @@ coda package to be installed. Defaulting to interval_type = "quantile"')
 #' @description Outputs a nicely-formatted table suitable for presentations and
 #'   reports. Especially useful for combining multiple results into a single
 #'   summary table.
-#' @param object An object of class "beta_binomial_fit".
+#' @param object An object of class "beta_binomial_fit" or a list (named or
+#'   unnamed) of "beta_binomial_fit" objects created by \code{beta_binom()}.
 #' @param conf_interval A logical flag indicating whether to include Bayesian
 #'   confidence intervals in the generated table.
 #' @param conf_level Probability level for credible intervals. 95\% by default.
@@ -182,6 +183,11 @@ coda package to be installed. Defaulting to interval_type = "quantile"')
 #' present_bbfit(fit, digits = 2)
 #' present_bbfit(fit, conf_interval = FALSE, digits = 3)
 #' present_bbfit(fit, conf_level = 0.8, interval_type = "HPD", digits = 2)
+#'
+#' fit_2 <- update(fit, x = c(8, 4), n = c(10, 50))
+#' fit_3 <- update(fit_2, x = c(1, 20), n = c(15, 40))
+#' fit_4 <- update(fit_3, x = c(20, 13), n = c(80, 45))
+#' present_bbfit(list("Day 1" = fit, "Day 2" = fit_2, "Day 3" = fit_3, "Day 4" = fit_4), digits = 2)
 #' }
 #' @export
 present_bbfit <- function(object, conf_interval = TRUE, conf_level = 0.95, interval_type = c("quantile", "HPD"), ...) {
@@ -195,33 +201,49 @@ present_bbfit <- function(object, conf_interval = TRUE, conf_level = 0.95, inter
   }
   args <- list(...)
   digits_ <- ifelse("digits" %in% names(args), args$digits[1], getOption("digits"))
-  posterior_summaries <- summary(object, conf_level = conf_level, interval_type = interval_type)
-  output <- data.frame(n1 = object$totals[1], n2 = object$totals[2],
-                       p1 = format_confint(100 * posterior_summaries["p1", "estimate"],
-                                           if_else(conf_interval,
-                                                   100 * posterior_summaries["p1", c("conf.low", "conf.high")],
-                                                   NULL),
-                                           digits = digits_, units = "%"),
-                       p2 = format_confint(100 * posterior_summaries["p2", "estimate"],
-                                           if_else(conf_interval,
-                                                   100 * posterior_summaries["p2", c("conf.low", "conf.high")],
-                                                   NULL),
-                                           digits = digits_, units = "%"),
-                       pd = format_confint(100 * posterior_summaries["prop_diff", "estimate"],
-                                           if_else(conf_interval,
-                                                   100 * posterior_summaries["prop_diff", c("conf.low", "conf.high")],
-                                                   NULL),
-                                           digits = digits_, units = "%"),
-                       rr = format_confint(posterior_summaries["relative_risk", "estimate"],
-                                           if_else(conf_interval,
-                                                   posterior_summaries["relative_risk", c("conf.low", "conf.high")],
-                                                   NULL),
-                                           digits = digits_),
-                       or = format_confint(posterior_summaries["odds_ratio", "estimate"],
-                                           if_else(conf_interval,
-                                                   posterior_summaries["odds_ratio", c("conf.low", "conf.high")],
-                                                   NULL),
-                                           digits = digits_))
-  names(output) <- c("Group 1", "Group 2", "Pr(Success) in Group 1", "Pr(Success) in Group 2", "Difference", "Relative Risk", "Odds Ratio")
+  if (class(object) == "list") {
+    # Check that all the elements of this list are of class "beta_binomial_fit" before proceeding:
+    if (any(vapply(temp, class, "") != "beta_binomial_fit")) {
+      stop("The list had an object that was not of class 'beta_binomial_fit'")
+    }
+  } else {
+    object <- list(object) # so that we can use lapply
+  }
+  posterior_summaries <- lapply(object, function(sub_object, conf_level, interval_type) {
+    posterior_summary <- summary.beta_binomial_fit(sub_object)
+    totals <- sub_object$totals
+    return(list(ps = posterior_summary, t = totals))
+  }, conf_level = conf_level, interval_type = interval_type)
+  output <- do.call(rbind, lapply(posterior_summaries, function(posterior_summary) {
+    return(data.frame(n1 = posterior_summary$t[1], n2 = posterior_summary$t[2],
+                      p1 = format_confint(100 * posterior_summary$ps["p1", "estimate"],
+                                          if_else(conf_interval,
+                                                  100 * posterior_summary$ps["p1", c("conf.low", "conf.high")],
+                                                  NULL),
+                                          digits = digits_, units = "%"),
+                      p2 = format_confint(100 * posterior_summary$ps["p2", "estimate"],
+                                          if_else(conf_interval,
+                                                  100 * posterior_summary$ps["p2", c("conf.low", "conf.high")],
+                                                  NULL),
+                                          digits = digits_, units = "%"),
+                      pd = format_confint(100 * posterior_summary$ps["prop_diff", "estimate"],
+                                          if_else(conf_interval,
+                                                  100 * posterior_summary$ps["prop_diff", c("conf.low", "conf.high")],
+                                                  NULL),
+                                          digits = digits_, units = "%"),
+                      rr = format_confint(posterior_summary$ps["relative_risk", "estimate"],
+                                          if_else(conf_interval,
+                                                  posterior_summary$ps["relative_risk", c("conf.low", "conf.high")],
+                                                  NULL),
+                                          digits = digits_),
+                      or = format_confint(posterior_summary$ps["odds_ratio", "estimate"],
+                                          if_else(conf_interval,
+                                                  posterior_summary$ps["odds_ratio", c("conf.low", "conf.high")],
+                                                  NULL),
+                                          digits = digits_),
+                      stringsAsFactors = FALSE))
+  }))
+  rownames(output) <- names(object)
+  colnames(output) <- c("Group 1", "Group 2", "Pr(Success) in Group 1", "Pr(Success) in Group 2", "Difference", "Relative Risk", "Odds Ratio")
   return(knitr::kable(output, ...))
 }

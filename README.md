@@ -92,6 +92,8 @@ present_bbfit(fit, conf_level = 0.8, interval_type = "HPD", digits = 2)
 |-------:|-------:|:-----------------------|:-----------------------|:----------------------|:-----------------|:-----------------|
 |     350|     550|57.12% (53.68%, 60.50%) |45.48% (42.74%, 48.10%) |11.64% (7.22%, 15.92%) |1.26 (1.15, 1.36) |1.61 (1.30, 1.87) |
 
+It also supports multiple models, which can be provided as a named or an unnamed list. See the example below.
+
 ## Updating the posterior
 
 In Bayesian statistics, we can reuse a previously computed posterior as a prior if we have additional data, allowing us to update the parameter estimates as new data becomes available. Suppose we collect 40 observations from 2 groups (20 per group) on the first day of the A/B test, and 10 observations per day for the next 2 weeks. Here we see what happens when we update the posterior with additional data on a daily basis:
@@ -101,13 +103,14 @@ In Bayesian statistics, we can reuse a previously computed posterior as a prior 
 ### Example Code
 
 ```R
-fit <- update(fit, x = c(100, 200), n = c(400, 600))
-present_bbfit(fit, digits = 2)
+fit_2 <- update(fit, x = c(100, 200), n = c(400, 600))
+present_bbfit(list("Day 1" = fit, "Day 2" = fit_2), digits = 2)
 ```
 
-| Group 1| Group 2|Pr(Success) in Group 1  |Pr(Success) in Group 2  |Difference            |Relative Risk     |Odds Ratio        |
-|-------:|-------:|:-----------------------|:-----------------------|:---------------------|:-----------------|:-----------------|
-|     750|    1150|39.96% (36.45%, 43.24%) |39.17% (36.23%, 42.01%) |0.78% (-3.73%, 5.08%) |1.02 (0.91, 1.13) |1.04 (0.85, 1.24) |
+|      | Group 1| Group 2|Pr(Success) in Group 1  |Pr(Success) in Group 2  |Difference             |Relative Risk     |Odds Ratio        |
+|:-----|-------:|-------:|:-----------------------|:-----------------------|:----------------------|:-----------------|:-----------------|
+|Day 1 |     350|     550|57.12% (51.88%, 62.29%) |45.48% (41.38%, 49.63%) |11.64% (4.96%, 18.30%) |1.26 (1.10, 1.43) |1.61 (1.22, 2.10) |
+|Day 2 |     750|    1150|39.96% (36.45%, 43.24%) |39.17% (36.23%, 42.01%) |0.78% (-3.73%, 5.08%)  |1.02 (0.91, 1.13) |1.04 (0.85, 1.24) |
 
 ## See also
 

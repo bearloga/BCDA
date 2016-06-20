@@ -134,13 +134,14 @@ plot(fit, interval_type = "HPD") # requires coda package to be installed
 # plot(fit) will use credible intervals computed using the quantile method
 ```
 
-```{r beta_binom_stan_fit_example_summary_hpd, eval = FALSE}
-summary(fit, interval_type = "HPD") # requires coda package to be installed
+```{r beta_binom_stan_fit_example_summary_hpd}
+summary(fit, interval_type = "HPD", digits = 2) # requires coda package to be installed
 # summary(fit) will give credible intervals using the quantile method
 ```
 
-```{r beta_binom_stan_fit, echo = FALSE}
-knitr::kable(summary(fit, interval_type = "HPD"))
+```{r beta_binom_stan_fit_example_present_hpd}
+present_bbfit(fit, interval_type = "HPD", digits = 2) # requires coda package to be installed
+# present_bbfit(fit) will give credible intervals using the quantile method
 ```
 
 11.4% more of aspirin takers don't experience a heart attack. The 95% Credible Interval (computed as the highest posterior density interval) for this difference of proportions ($p_{\text{aspirin, no attack}} - p_{\text{placebo, no attack}}$) is (0.48%, 1.09%). Aspirin takers were 1.005-1.01 times more likely to have no heart attacks. The odds of not developing a heart attack in Aspirin takers were 1.42-2.303 times the odds of those in the placebo group.

@@ -1,7 +1,7 @@
 Package: BCDA
 Type: Package
 Title: Tools for Bayesian Categorical Data Analysis
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: c(
     person("Mikhail", "Popov", email = "mpopov@wikimedia.org", role = c("cre", "aut")),
     person("Wikimedia Foundation", role = "cph"))

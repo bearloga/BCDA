@@ -8,7 +8,8 @@ present_bbfit(object, conf_interval = TRUE, conf_level = 0.95,
   interval_type = c("quantile", "HPD"), ...)
 }
 \arguments{
-\item{object}{An object of class "beta_binomial_fit".}
+\item{object}{An object of class "beta_binomial_fit" or a list (named or
+unnamed) of "beta_binomial_fit" objects created by \code{beta_binom()}.}
 
 \item{conf_interval}{A logical flag indicating whether to include Bayesian
 confidence intervals in the generated table.}
@@ -50,6 +51,11 @@ present_bbfit(fit) # uses getOption("digits")
 present_bbfit(fit, digits = 2)
 present_bbfit(fit, conf_interval = FALSE, digits = 3)
 present_bbfit(fit, conf_level = 0.8, interval_type = "HPD", digits = 2)
+
+fit_2 <- update(fit, x = c(8, 4), n = c(10, 50))
+fit_3 <- update(fit_2, x = c(1, 20), n = c(15, 40))
+fit_4 <- update(fit_3, x = c(20, 13), n = c(80, 45))
+present_bbfit(list("Day 1" = fit, "Day 2" = fit_2, "Day 3" = fit_3, "Day 4" = fit_4), digits = 2)
 }
 }
 
