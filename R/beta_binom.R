@@ -1,3 +1,6 @@
+#' @include BCDA.R
+NULL
+
 #' @title Binomial Model with Beta Priors
 #'
 #' @description
@@ -69,7 +72,7 @@ update.beta_binomial_fit <- function(object, x, n = NULL, n_sims = 1e3) {
   return(fit)
 }
 
-#' @title Summarize the posterior draws from a fitted Beta-Binomial model
+#' @title Summarize posterior draws from a fitted Beta-Binom model in a tidy form.
 #' @description Outputs a data frame of point estimates and Bayesian confidence
 #'   intervals for group proportions, proportion difference, relative risk, and
 #'   odds ratio.
@@ -85,10 +88,11 @@ update.beta_binomial_fit <- function(object, x, n = NULL, n_sims = 1e3) {
 #'     \item{conf.high}{Credible interval upper bound.}
 #'   }
 #' @examples \dontrun{
-#' summary(beta_binom(x = c(200, 250), n = c(350, 550)))
+#' tidy(beta_binom(x = c(200, 250), n = c(350, 550)))
 #' }
+#' @method tidy beta_binomial_fit
 #' @export
-summary.beta_binomial_fit <- function(x, conf_level = 0.95, interval_type = c("quantile", "HPD"), ...) {
+tidy.beta_binomial_fit <- function(x, conf_level = 0.95, interval_type = c("quantile", "HPD"), ...) {
   if (!requireNamespace("coda", quietly = TRUE) & interval_type[1] == "HPD") {
     message('High posterior density intervals (interval_type = "HPD") require the
 coda package to be installed. Using interval_type = "quantile".')
@@ -106,11 +110,6 @@ coda package to be installed. Using interval_type = "quantile".')
   return(cbind(output, conf.low = interval[, 'lower'], conf.high = interval[, 'upper']))
 }
 
-#' @export
-print.beta_binomial_fit <- function(x, ...) {
-  print(summary(x))
-}
-
 #' @title Visualize posterior draws from a fitted Beta-Binomial model
 #' @description Plots the point estimates and 95\% and 80\% credible intervals
 #'   for parameters, including relative risk and odds ratio.
@@ -123,8 +122,8 @@ plot.beta_binomial_fit <- function(x, interval_type = c("quantile", "HPD")) {
 coda package to be installed. Defaulting to interval_type = "quantile"')
     interval_type <- "quantile"
   }
-  temp95 <- summary(x, conf_level = 0.95, interval_type = interval_type)
-  temp80 <- summary(x, conf_level = 0.80, interval_type = interval_type)
+  temp95 <- tidy(x, conf_level = 0.95, interval_type = interval_type)
+  temp80 <- tidy(x, conf_level = 0.80, interval_type = interval_type)
   temp95$term <- factor(rownames(temp95),
                         levels = c("p1", "p2", "prop_diff", "relative_risk", "odds_ratio"),
                         labels = c("Prop 1", "Prop 2", "Prop 1 - Prop 2", "Relative Risk", "Odds Ratio"))
@@ -149,7 +148,7 @@ coda package to be installed. Defaulting to interval_type = "quantile"')
   return(gg)
 }
 
-#' @title Present the posterior results of the Beta-Binomial model
+#' @title Present the summarized posterior results of the Beta-Binomial model
 #' @description Outputs a nicely-formatted table suitable for presentations and
 #'   reports. Especially useful for combining multiple results into a single
 #'   summary table.
@@ -159,6 +158,8 @@ coda package to be installed. Defaulting to interval_type = "quantile"')
 #'   confidence intervals in the generated table.
 #' @param conf_level Probability level for credible intervals. 95\% by default.
 #' @param interval_type Method for computing intervals ("quantile" or "HPD").
+#' @param raw Return a data frame instead of the character vector produced by
+#'   \code{knitr::kable}. Useful for performing additional data manipulations.
 #' @param ... Arguments to forward to \code{knitr::kable} (e.g. \code{format}).
 #' @return A character vector formatted as Markdown, HTML, or LaTeX. The table
 #'   has the following columns:
@@ -190,7 +191,7 @@ coda package to be installed. Defaulting to interval_type = "quantile"')
 #' present_bbfit(list("Day 1" = fit, "Day 2" = fit_2, "Day 3" = fit_3, "Day 4" = fit_4), digits = 2)
 #' }
 #' @export
-present_bbfit <- function(object, conf_interval = TRUE, conf_level = 0.95, interval_type = c("quantile", "HPD"), ...) {
+present_bbfit <- function(object, conf_interval = TRUE, conf_level = 0.95, interval_type = c("quantile", "HPD"), raw = FALSE, ...) {
   if (!requireNamespace("knitr", quietly = TRUE)) {
     stop('knitr is required for generating a formatted table"')
   }
@@ -210,7 +211,7 @@ present_bbfit <- function(object, conf_interval = TRUE, conf_level = 0.95, inter
     object <- list(object) # so that we can use lapply
   }
   posterior_summaries <- lapply(object, function(sub_object, conf_level, interval_type) {
-    posterior_summary <- summary.beta_binomial_fit(sub_object)
+    posterior_summary <- tidy(sub_object)
     totals <- sub_object$totals
     return(list(ps = posterior_summary, t = totals))
   }, conf_level = conf_level, interval_type = interval_type)
@@ -246,4 +247,14 @@ present_bbfit <- function(object, conf_interval = TRUE, conf_level = 0.95, inter
   rownames(output) <- names(object)
   colnames(output) <- c("Group 1", "Group 2", "Pr(Success) in Group 1", "Pr(Success) in Group 2", "Difference", "Relative Risk", "Odds Ratio")
   return(knitr::kable(output, ...))
+}
+
+#' @export
+print.beta_binomial_fit <- function(x, ...) {
+  print(tidy(x))
+}
+
+#' @export
+summary.beta_binomial_fit <- function(x, ...) {
+  format(present_bbfit(x, raw = TRUE, ...))
 }

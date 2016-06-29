@@ -130,17 +130,24 @@ fit <- beta_binom(aspirin)
 We can also provide success counts and totals: `fit <- beta_binom(x = aspirin[, 1], n = aspirin[, 1] + aspirin[, 2])`
 
 ```{r beta_binom_stan_fit_example_plot, message = FALSE, fig.width = 7, fig.height = 4}
-plot(fit, interval_type = "HPD") # requires coda package to be installed
+plot(fit, interval_type = "HPD") # HPD intervals require coda
 # plot(fit) will use credible intervals computed using the quantile method
 ```
 
+```{r beta_binom_stan_fit_example_tidy_hpd}
+tidy(fit, interval_type = "HPD", digits = 2) # HPD intervals require coda
+# tidy(fit) will give credible intervals using the quantile method
+```
+
 ```{r beta_binom_stan_fit_example_summary_hpd}
-summary(fit, interval_type = "HPD", digits = 2) # requires coda package to be installed
+summary(fit, interval_type = "HPD", digits = 2) # HPD intervals require coda
 # summary(fit) will give credible intervals using the quantile method
 ```
 
+To produce LaTeX or Markdown versions of the table, use the underlying `present_bbfit` function that is used inside `summary` for the `beta_binomial_fit` object:
+
 ```{r beta_binom_stan_fit_example_present_hpd}
-present_bbfit(fit, interval_type = "HPD", digits = 2) # requires coda package to be installed
+present_bbfit(fit, interval_type = "HPD", digits = 2) # HPD intervals require coda
 # present_bbfit(fit) will give credible intervals using the quantile method
 ```
 

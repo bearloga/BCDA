@@ -21,29 +21,42 @@ devtools::install_github("bearloga/BCDA")
 
 ## Usage
 
-Note that `beta_binom()` uses the Jeffreys prior by default.
+All examples will use the following (fake) data:
 
 ```R
 data <- matrix(c(200, 150, 250, 300), nrow = 2, byrow = TRUE)
 colnames(data) <- c('Safe' ,'Dangerous')
 rownames(data) <- c('Animals', 'Plants')
+(data)
+```
+
+|        | Safe| Dangerous|
+|:-------|----:|---------:|
+|Animals |  200|       150|
+|Plants  |  250|       300|
+
+**Note** that `beta_binom()` uses the Jeffreys prior by default.
+
+```R
+library(BCDA)
 
 set.seed(0)
 (fit <- beta_binom(data))
 ```
 
-|              | estimate| std.error| conf.low| conf.high|
-|:-------------|--------:|---------:|--------:|---------:|
-|p1            |    0.571|     0.027|    0.519|     0.623|
-|p2            |    0.455|     0.021|    0.414|     0.496|
-|prop_diff     |    0.116|     0.034|    0.050|     0.183|
-|relative_risk |    1.259|     0.083|    1.102|     1.430|
-|odds_ratio    |    1.614|     0.225|    1.220|     2.102|
+```
+               estimate  std.error  conf.low conf.high
+p1            0.5712235 0.02661461 0.5187769 0.6228546
+p2            0.4547922 0.02109604 0.4138250 0.4962655
+prop_diff     0.1164313 0.03400152 0.0495672 0.1830317
+relative_risk 1.2587400 0.08324475 1.1022458 1.4298146
+odds_ratio    1.6143830 0.22515935 1.2197006 2.1016176
+```
 
 The credible intervals above are calculated using quantiles. If we have the **coda** package installed, we can also obtain the high posterior density intervals:
 
 ```R
-summary(fit, interval_type = "HPD")
+tidy(fit, interval_type = "HPD")
 ```
 
 |              | estimate| std.error| conf.low| conf.high|

@@ -2,10 +2,10 @@
 % Please edit documentation in R/beta_binom.R
 \name{present_bbfit}
 \alias{present_bbfit}
-\title{Present the posterior results of the Beta-Binomial model}
+\title{Present the summarized posterior results of the Beta-Binomial model}
 \usage{
 present_bbfit(object, conf_interval = TRUE, conf_level = 0.95,
-  interval_type = c("quantile", "HPD"), ...)
+  interval_type = c("quantile", "HPD"), raw = FALSE, ...)
 }
 \arguments{
 \item{object}{An object of class "beta_binomial_fit" or a list (named or
@@ -17,6 +17,9 @@ confidence intervals in the generated table.}
 \item{conf_level}{Probability level for credible intervals. 95\% by default.}
 
 \item{interval_type}{Method for computing intervals ("quantile" or "HPD").}
+
+\item{raw}{Return a data frame instead of the character vector produced by
+\code{knitr::kable}. Useful for performing additional data manipulations.}
 
 \item{...}{Arguments to forward to \code{knitr::kable} (e.g. \code{format}).}
 }

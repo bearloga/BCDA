@@ -12,7 +12,8 @@ LazyData: TRUE
 Depends:
     R (>= 3.0.2)
 Imports:
-    ggplot2 (>= 2.0.0)
+    ggplot2 (>= 2.0.0),
+    broom
 Suggests:
     knitr,
     rmarkdown,
@@ -23,4 +24,9 @@ Suggests:
 URL: https://github.com/bearloga/BCDA
 BugReports: https://github.com/bearloga/BCDA/issues
 VignetteBuilder: knitr
+Collate:
+    'BCDA.R'
+    'beta_binom.R'
+    'est_multinom.R'
+    'utils.R'
 RoxygenNote: 5.0.1
