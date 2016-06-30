@@ -1,3 +1,4 @@
+# Used in beta_binom and update.beta_binomial_fit
 check_inputs <- function(x, n) {
   if (is.null(n)) {
     if (is.vector(x)) {
@@ -46,3 +47,33 @@ if_else <- function(test, yes, no) {
   }
   return(no)
 }
+
+#' @title Utilities for tallied data frames
+#' @description Useful when piping a grouped data frame to \code{dplyr::tally()}
+#'   and then converting that into a contingency table before piping it into
+#'   \code{beta_binom}, or flipping rows and columns in between those steps.
+#'   Works for data frames grouped by a single variable only, to create tables
+#'   with more than 2 dimensions, use \code{xtabs}.
+#' @param df A data.frame where the first column is the group column and the
+#'   rest are counts of outcomes.
+#' @return A 2-by-2 table.
+#' @rdname utils
+#' @export
+make_table <- function(df) {
+  if (!"data.frame" %in% class(df)) {
+    stop("object must be a data.frame")
+  }
+  output <- as.table(as.matrix(as.data.frame(df[, -1])))
+  colnames(output) <- names(df[, -1])
+  rownames(output) <- as.character(df[[1]])
+  dimnames(output) <- c(names(df)[1], "Outcome")
+  return(output)
+}
+#' @param x A 2-by-2 table produced by \code{make_table()}, \code{table()}, or
+#'   \code{xtabs()}.
+#' @rdname utils
+#' @export
+flip_cols <- function(x) { return(x[, rev(1:(dim(x)[2]))]) }
+#' @rdname utils
+#' @export
+flip_rows <- function(x) { return(x[rev(1:(dim(x)[1])), ]) }

@@ -10,11 +10,12 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
-options(digits = 4)
+options(digits = 3)
+library(magrittr)
+library(purrr)
 library(ggplot2)
 library(ggthemes)
 theme_set(ggthemes::theme_tufte(base_family = "Gill Sans"))
-library(magrittr)
 ```
 
 The following table is from a report on the relationship between aspirin use and heart attacks by the Physicians' Health Study Research Group at Harvard Medical School. It was a 5-year randomized study of whether regular aspirin take reduces mortality from cardiovascular disease. Of the 11,034 physicians taking a placebo, 18 and 17 suffered fatal and non-fatal heart attacks, respectively. Of the 11,037 taking aspirin, 5 and 99 suffered fatal and non-fatal heart attacks, respectively.
@@ -130,40 +131,69 @@ fit <- beta_binom(aspirin)
 We can also provide success counts and totals: `fit <- beta_binom(x = aspirin[, 1], n = aspirin[, 1] + aspirin[, 2])`
 
 ```{r beta_binom_stan_fit_example_plot, message = FALSE, fig.width = 7, fig.height = 4}
-plot(fit, interval_type = "HPD") # requires coda package to be installed
+plot(fit, interval_type = "HPD") # HPD intervals require coda
 # plot(fit) will use credible intervals computed using the quantile method
 ```
 
 ```{r beta_binom_stan_fit_example_summary_hpd}
-summary(fit, interval_type = "HPD", digits = 2) # requires coda package to be installed
+summary(fit, interval_type = "HPD", digits = 2) # HPD intervals require coda
 # summary(fit) will give credible intervals using the quantile method
 ```
 
+To produce LaTeX or Markdown versions of the table, use the underlying `present_bbfit` function that is used inside `summary` for the `beta_binomial_fit` object:
+
 ```{r beta_binom_stan_fit_example_present_hpd}
-present_bbfit(fit, interval_type = "HPD", digits = 2) # requires coda package to be installed
+present_bbfit(fit, interval_type = "HPD", digits = 2) # HPD intervals require coda
 # present_bbfit(fit) will give credible intervals using the quantile method
 ```
 
 11.4% more of aspirin takers don't experience a heart attack. The 95% Credible Interval (computed as the highest posterior density interval) for this difference of proportions ($p_{\text{aspirin, no attack}} - p_{\text{placebo, no attack}}$) is (0.48%, 1.09%). Aspirin takers were 1.005-1.01 times more likely to have no heart attacks. The odds of not developing a heart attack in Aspirin takers were 1.42-2.303 times the odds of those in the placebo group.
 
+## Tidy Summaries and Functional Programming
+
+Because **BCDA** implements the `tidy()` verb from David Robinson's **broom** package, it's really easy to compare the results of different priors using **purrr**'s `map` family of functions and obtain a single tidy data frame that we can visualize using **ggplot2**.
+
+```{r prior_comparison, fig.width = 7, fig.height = 4}
+priors <- list(Jeffreys = c(a = 0.5, b = 0.5, c = 0.5, d = 0.5),
+               Uniform = c(a = 1, b = 1, c = 1, d = 1),
+               "Highly Subjective" = c(a = 40, b = 1.1, c = 20, d = 1.2))
+
+# What if we only had 1/100th of subjects in each cell?
+aspirin_subset <- round(aspirin/100)
+
+# We can use functional programming with tidy data philosophy:
+fits <- priors %>%
+  map(~ beta_binom(aspirin_subset, prior = .x)) %>%
+  map_df(tidy, .id = "prior") %>%
+  subset(term %in% c("p1", "p2"))
+
+# Then visualize the estimates with ggplot2:
+ggplot(fits) +
+  geom_pointrange(aes(x = term, y = estimate,
+                      ymin = conf.low, ymax = conf.high,
+                      color = prior),
+                  position = position_dodge(width = 1)) +
+  scale_x_discrete("Group", labels = c("Aspirin", "Placebo"), limits = c("p1", "p2")) +
+  scale_y_continuous("Probability of No Attack", labels = scales::percent_format()) +
+  coord_flip()
+```
+
 ## Updating
 
-```{r bayesian_initial, fig.width = 7, fig.height = 4}
+```{r bayesian_initial}
 set.seed(0)
 group_1 <- sample.int(2, 20, prob = c(0.55, 0.45), replace = TRUE)-1
 group_2 <- sample.int(2, 20, prob = c(0.65, 0.35), replace = TRUE)-1
 fit <- beta_binom(c(sum(group_1), sum(group_2)), c(length(group_1), length(group_2)))
-temp <- summary(fit); temp$term <- rownames(temp); rownames(temp) <- NULL; temp$day <- 1
-posterior_summaries <- temp
+posterior_summaries <- cbind(day = 1, tidy(fit))
 ```
 
-```{r bayesian_updating, fig.width = 7, fig.height = 4}
+```{r bayesian_updating}
 for (day in 2:14) {
   group_1 <- sample.int(2, 10, prob = c(0.55, 0.45), replace = TRUE)-1
   group_2 <- sample.int(2, 10, prob = c(0.65, 0.35), replace = TRUE)-1
   fit <- update(fit, c(sum(group_1), sum(group_2)), c(length(group_1), length(group_2)))
-  temp <- summary(fit); temp$term <- rownames(temp); rownames(temp) <- NULL; temp$day <- day
-  posterior_summaries <- rbind(posterior_summaries, temp)
+  posterior_summaries <- rbind(posterior_summaries, cbind(day = day, tidy(fit)))
 }
 posterior_summaries$term <- factor(posterior_summaries$term,
                                    levels = c("p1", "p2", "prop_diff",

@@ -1,3 +1,6 @@
+#' @include generics.R
+NULL
+
 #' @title Binomial Model with Beta Priors
 #'
 #' @description
@@ -69,26 +72,28 @@ update.beta_binomial_fit <- function(object, x, n = NULL, n_sims = 1e3) {
   return(fit)
 }
 
-#' @title Summarize the posterior draws from a fitted Beta-Binomial model
-#' @description Outputs a data frame of point estimates and Bayesian confidence
+#' @description Summarize posterior draws from a fitted Beta-Binom model in a
+#'   tidy form. Outputs a data frame of point estimates and Bayesian confidence
 #'   intervals for group proportions, proportion difference, relative risk, and
 #'   odds ratio.
 #' @param x An object of class "beta_binomial_fit".
 #' @param conf_level Probability level for credible intervals. 95\% by default.
 #' @param interval_type Method for computing intervals ("quantile" or "HPD").
 #' @return A data frame consistent with the output of David Robinson's
-#'   \code{broom::tidyMCMC()} tidying method:
+#'   \code{\link[broom]{tidyMCMC}} tidying method:
 #'   \describe{
+#'     \item{term}{Name of the parameter.}
 #'     \item{estimate}{Point estimate (mean of posterior draws).}
 #'     \item{std.error}{Standard error.}
 #'     \item{conf.low}{Credible interval lower bound.}
 #'     \item{conf.high}{Credible interval upper bound.}
 #'   }
 #' @examples \dontrun{
-#' summary(beta_binom(x = c(200, 250), n = c(350, 550)))
+#' tidy(beta_binom(x = c(200, 250), n = c(350, 550)))
 #' }
+#' @name tidy
 #' @export
-summary.beta_binomial_fit <- function(x, conf_level = 0.95, interval_type = c("quantile", "HPD"), ...) {
+tidy.beta_binomial_fit <- function(x, conf_level = 0.95, interval_type = c("quantile", "HPD"), ...) {
   if (!requireNamespace("coda", quietly = TRUE) & interval_type[1] == "HPD") {
     message('High posterior density intervals (interval_type = "HPD") require the
 coda package to be installed. Using interval_type = "quantile".')
@@ -103,12 +108,9 @@ coda package to be installed. Using interval_type = "quantile".')
   output <- as.data.frame(t(apply(x$posterior_simulations, 2, function(term) {
     return(c(estimate = mean(term), std.error = sd(term)))
   })), stringsAsFactors = FALSE)
-  return(cbind(output, conf.low = interval[, 'lower'], conf.high = interval[, 'upper']))
-}
-
-#' @export
-print.beta_binomial_fit <- function(x, ...) {
-  print(summary(x))
+  output <- cbind(term = rownames(output), output, conf.low = interval[, 'lower'], conf.high = interval[, 'upper'], stringsAsFactors = FALSE)
+  rownames(output) <- NULL
+  return(output)
 }
 
 #' @title Visualize posterior draws from a fitted Beta-Binomial model
@@ -116,6 +118,7 @@ print.beta_binomial_fit <- function(x, ...) {
 #'   for parameters, including relative risk and odds ratio.
 #' @param x An object of class "beta_binomial_fit".
 #' @param interval_type Method for computing intervals ("quantile" or "HPD").
+#' @return A ggplot2 object.
 #' @export
 plot.beta_binomial_fit <- function(x, interval_type = c("quantile", "HPD")) {
   if (!requireNamespace("coda", quietly = TRUE) & interval_type[1] == "HPD") {
@@ -123,14 +126,8 @@ plot.beta_binomial_fit <- function(x, interval_type = c("quantile", "HPD")) {
 coda package to be installed. Defaulting to interval_type = "quantile"')
     interval_type <- "quantile"
   }
-  temp95 <- summary(x, conf_level = 0.95, interval_type = interval_type)
-  temp80 <- summary(x, conf_level = 0.80, interval_type = interval_type)
-  temp95$term <- factor(rownames(temp95),
-                        levels = c("p1", "p2", "prop_diff", "relative_risk", "odds_ratio"),
-                        labels = c("Prop 1", "Prop 2", "Prop 1 - Prop 2", "Relative Risk", "Odds Ratio"))
-  temp80$term <- factor(rownames(temp80),
-                        levels = c("p1", "p2", "prop_diff", "relative_risk", "odds_ratio"),
-                        labels = c("Prop 1", "Prop 2", "Prop 1 - Prop 2", "Relative Risk", "Odds Ratio"))
+  temp95 <- tidy(x, conf_level = 0.95, interval_type = interval_type)
+  temp80 <- tidy(x, conf_level = 0.80, interval_type = interval_type)
   gg <- ggplot2::ggplot(data = temp80, ggplot2::aes(x = estimate, y = term)) +
     ggplot2::geom_segment(data = temp95,
                           ggplot2::aes(x = conf.low, xend = conf.high,
@@ -140,7 +137,8 @@ coda package to be installed. Defaulting to interval_type = "quantile"')
                                        y = term, yend = term),
                  color = "#e41a1c", size = 1.25) +
     ggplot2::geom_point(size = 2) +
-    ggplot2::scale_y_discrete(limits = rev(temp80$term))
+    ggplot2::scale_y_discrete(limits = rev(c("p1", "p2", "prop_diff", "relative_risk", "odds_ratio")),
+                              labels = rev(c("Prop 1", "Prop 2", "Prop 1 - Prop 2", "Relative Risk", "Odds Ratio")))
   if (interval_type[1] == "quantile") {
     gg <- gg + ggplot2::labs(title = "95% and 80% Credible Intervals", y = NULL, x = NULL)
   } else {
@@ -149,7 +147,7 @@ coda package to be installed. Defaulting to interval_type = "quantile"')
   return(gg)
 }
 
-#' @title Present the posterior results of the Beta-Binomial model
+#' @title Present the summarized posterior results of the Beta-Binomial model
 #' @description Outputs a nicely-formatted table suitable for presentations and
 #'   reports. Especially useful for combining multiple results into a single
 #'   summary table.
@@ -159,6 +157,10 @@ coda package to be installed. Defaulting to interval_type = "quantile"')
 #'   confidence intervals in the generated table.
 #' @param conf_level Probability level for credible intervals. 95\% by default.
 #' @param interval_type Method for computing intervals ("quantile" or "HPD").
+#' @param raw A logical flag to return a data frame instead of the character
+#'   vector produced by \code{knitr::kable}. Useful for performing additional
+#'   data manipulations.
+#' @param fancy_names A logical flag to use reader-friendly column names.
 #' @param ... Arguments to forward to \code{knitr::kable} (e.g. \code{format}).
 #' @return A character vector formatted as Markdown, HTML, or LaTeX. The table
 #'   has the following columns:
@@ -190,7 +192,7 @@ coda package to be installed. Defaulting to interval_type = "quantile"')
 #' present_bbfit(list("Day 1" = fit, "Day 2" = fit_2, "Day 3" = fit_3, "Day 4" = fit_4), digits = 2)
 #' }
 #' @export
-present_bbfit <- function(object, conf_interval = TRUE, conf_level = 0.95, interval_type = c("quantile", "HPD"), ...) {
+present_bbfit <- function(object, conf_interval = TRUE, conf_level = 0.95, interval_type = c("quantile", "HPD"), raw = FALSE, fancy_names = TRUE, ...) {
   if (!requireNamespace("knitr", quietly = TRUE)) {
     stop('knitr is required for generating a formatted table"')
   }
@@ -203,47 +205,52 @@ present_bbfit <- function(object, conf_interval = TRUE, conf_level = 0.95, inter
   digits_ <- ifelse("digits" %in% names(args), args$digits[1], getOption("digits"))
   if (class(object) == "list") {
     # Check that all the elements of this list are of class "beta_binomial_fit" before proceeding:
-    if (any(vapply(temp, class, "") != "beta_binomial_fit")) {
+    if (any(vapply(object, class, "") != "beta_binomial_fit")) {
       stop("The list had an object that was not of class 'beta_binomial_fit'")
     }
   } else {
     object <- list(object) # so that we can use lapply
   }
   posterior_summaries <- lapply(object, function(sub_object, conf_level, interval_type) {
-    posterior_summary <- summary.beta_binomial_fit(sub_object)
+    posterior_summary <- tidy(sub_object, conf_level = conf_level, interval_type = interval_type)
     totals <- sub_object$totals
     return(list(ps = posterior_summary, t = totals))
   }, conf_level = conf_level, interval_type = interval_type)
   output <- do.call(rbind, lapply(posterior_summaries, function(posterior_summary) {
     return(data.frame(n1 = posterior_summary$t[1], n2 = posterior_summary$t[2],
-                      p1 = format_confint(100 * posterior_summary$ps["p1", "estimate"],
+                      p1 = format_confint(100 * posterior_summary$ps[posterior_summary$ps$term == "p1", "estimate"],
                                           if_else(conf_interval,
-                                                  100 * posterior_summary$ps["p1", c("conf.low", "conf.high")],
+                                                  100 * posterior_summary$ps[posterior_summary$ps$term == "p1", c("conf.low", "conf.high")],
                                                   NULL),
                                           digits = digits_, units = "%"),
-                      p2 = format_confint(100 * posterior_summary$ps["p2", "estimate"],
+                      p2 = format_confint(100 * posterior_summary$ps[posterior_summary$ps$term == "p2", "estimate"],
                                           if_else(conf_interval,
-                                                  100 * posterior_summary$ps["p2", c("conf.low", "conf.high")],
+                                                  100 * posterior_summary$ps[posterior_summary$ps$term == "p2", c("conf.low", "conf.high")],
                                                   NULL),
                                           digits = digits_, units = "%"),
-                      pd = format_confint(100 * posterior_summary$ps["prop_diff", "estimate"],
+                      pd = format_confint(100 * posterior_summary$ps[posterior_summary$ps$term == "prop_diff", "estimate"],
                                           if_else(conf_interval,
-                                                  100 * posterior_summary$ps["prop_diff", c("conf.low", "conf.high")],
+                                                  100 * posterior_summary$ps[posterior_summary$ps$term == "prop_diff", c("conf.low", "conf.high")],
                                                   NULL),
                                           digits = digits_, units = "%"),
-                      rr = format_confint(posterior_summary$ps["relative_risk", "estimate"],
+                      rr = format_confint(posterior_summary$ps[posterior_summary$ps$term == "relative_risk", "estimate"],
                                           if_else(conf_interval,
-                                                  posterior_summary$ps["relative_risk", c("conf.low", "conf.high")],
+                                                  posterior_summary$ps[posterior_summary$ps$term == "relative_risk", c("conf.low", "conf.high")],
                                                   NULL),
                                           digits = digits_),
-                      or = format_confint(posterior_summary$ps["odds_ratio", "estimate"],
+                      or = format_confint(posterior_summary$ps[posterior_summary$ps$term == "odds_ratio", "estimate"],
                                           if_else(conf_interval,
-                                                  posterior_summary$ps["odds_ratio", c("conf.low", "conf.high")],
+                                                  posterior_summary$ps[posterior_summary$ps$term == "odds_ratio", c("conf.low", "conf.high")],
                                                   NULL),
                                           digits = digits_),
                       stringsAsFactors = FALSE))
   }))
   rownames(output) <- names(object)
-  colnames(output) <- c("Group 1", "Group 2", "Pr(Success) in Group 1", "Pr(Success) in Group 2", "Difference", "Relative Risk", "Odds Ratio")
+  if (fancy_names) {
+    colnames(output) <- c("Group 1", "Group 2", "Pr(Success) in Group 1", "Pr(Success) in Group 2", "Difference", "Relative Risk", "Odds Ratio")
+  }
+  if (raw) {
+    return(output)
+  }
   return(knitr::kable(output, ...))
 }

@@ -11,6 +11,9 @@
 
 \item{interval_type}{Method for computing intervals ("quantile" or "HPD").}
 }
+\value{
+A ggplot2 object.
+}
 \description{
 Plots the point estimates and 95\% and 80\% credible intervals
   for parameters, including relative risk and odds ratio.
