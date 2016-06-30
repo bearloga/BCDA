@@ -21,12 +21,13 @@ Suggests:
     LearnBayes,
     conting,
     ggthemes,
-    tibble
+    purrr
 URL: https://github.com/bearloga/BCDA
 BugReports: https://github.com/bearloga/BCDA/issues
 VignetteBuilder: knitr
 Collate:
     'BCDA.R'
+    'generics.R'
     'beta_binom.R'
     'est_multinom.R'
     'utils.R'

@@ -5,7 +5,8 @@
 \title{Present the summarized posterior results of the Beta-Binomial model}
 \usage{
 present_bbfit(object, conf_interval = TRUE, conf_level = 0.95,
-  interval_type = c("quantile", "HPD"), raw = FALSE, ...)
+  interval_type = c("quantile", "HPD"), raw = FALSE, fancy_names = TRUE,
+  ...)
 }
 \arguments{
 \item{object}{An object of class "beta_binomial_fit" or a list (named or
@@ -18,8 +19,11 @@ confidence intervals in the generated table.}
 
 \item{interval_type}{Method for computing intervals ("quantile" or "HPD").}
 
-\item{raw}{Return a data frame instead of the character vector produced by
-\code{knitr::kable}. Useful for performing additional data manipulations.}
+\item{raw}{A logical flag to return a data frame instead of the character
+vector produced by \code{knitr::kable}. Useful for performing additional
+data manipulations.}
+
+\item{fancy_names}{A logical flag to use reader-friendly column names.}
 
 \item{...}{Arguments to forward to \code{knitr::kable} (e.g. \code{format}).}
 }

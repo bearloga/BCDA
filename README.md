@@ -38,34 +38,35 @@ rownames(data) <- c('Animals', 'Plants')
 **Note** that `beta_binom()` uses the Jeffreys prior by default.
 
 ```R
-library(BCDA)
+library(BCDA) # options(digits = 2)
 
 set.seed(0)
 (fit <- beta_binom(data))
 ```
 
 ```
-               estimate  std.error  conf.low conf.high
-p1            0.5712235 0.02661461 0.5187769 0.6228546
-p2            0.4547922 0.02109604 0.4138250 0.4962655
-prop_diff     0.1164313 0.03400152 0.0495672 0.1830317
-relative_risk 1.2587400 0.08324475 1.1022458 1.4298146
-odds_ratio    1.6143830 0.22515935 1.2197006 2.1016176
+           term estimate std.error conf.low conf.high
+1            p1     0.57     0.027     0.52      0.62
+2            p2     0.45     0.021     0.41      0.50
+3     prop_diff     0.12     0.034     0.05      0.18
+4 relative_risk     1.26     0.083     1.10      1.43
+5    odds_ratio     1.61     0.225     1.22      2.10
 ```
 
 The credible intervals above are calculated using quantiles. If we have the **coda** package installed, we can also obtain the high posterior density intervals:
 
 ```R
-tidy(fit, interval_type = "HPD")
+print(fit, interval_type = "HPD")
 ```
 
-|              | estimate| std.error| conf.low| conf.high|
-|:-------------|--------:|---------:|--------:|---------:|
-|p1            |    0.571|     0.027|    0.519|     0.623|
-|p2            |    0.455|     0.021|    0.413|     0.496|
-|prop_diff     |    0.116|     0.034|    0.051|     0.184|
-|relative_risk |    1.259|     0.083|    1.096|     1.422|
-|odds_ratio    |    1.614|     0.225|    1.198|     2.068|
+```
+           term estimate std.error conf.low conf.high
+1            p1     0.57     0.027    0.519      0.62
+2            p2     0.45     0.021    0.413      0.50
+3     prop_diff     0.12     0.034    0.051      0.18
+4 relative_risk     1.26     0.083    1.096      1.42
+5    odds_ratio     1.61     0.225    1.198      2.07
+```
 
 ```R
 plot(fit)
@@ -73,12 +74,34 @@ plot(fit)
 
 ![Preview of visualization of the posterior draws.](plot.png)
 
-## Tabular presentation of the results
+## Presentation of the results
 
-This package includes a function `present_bbfit()` that creates a nicely formatted table of results from fitting a `beta_binom()` model:
+The package includes a variety of functions for looking at the results from fitting a `beta_binom()` model. To aid in functional programming, we implemented the `tidy()` and `glance()` verbs from David Robinson's **broom** package for users:
 
 ```R
-present_bbfit(fit, digits = 2)
+library(magrittr)
+fit %>% tidy %>% head(2)
+```
+
+```
+  term estimate std.error conf.low conf.high
+1   p1     0.57     0.027     0.52      0.62
+2   p2     0.45     0.021     0.41      0.50
+```
+
+```R
+fit %>% glance
+```
+
+```
+   n1  n2                      p1                      p2
+1 350 550 57.12% (51.88%, 62.29%) 45.48% (41.38%, 49.63%)
+```
+
+This is perfectly okay in an interative data analysis scenario, but not when presenting the results in a report. `glance()` is actually a special case of the `present_bbfit()` function which generates all those nicely formatted credible intervals but outputs a Markdown/LaTeX-formatted table by default:
+
+```R
+present_bbfit(fit)
 ```
 
 | Group 1| Group 2|Pr(Success) in Group 1  |Pr(Success) in Group 2  |Difference             |Relative Risk     |Odds Ratio        |
@@ -95,10 +118,10 @@ present_bbfit(fit, conf_interval = FALSE, digits = 3)
 |-------:|-------:|:----------------------|:----------------------|:----------|:-------------|:----------|
 |     350|     550|57.122%                |45.479%                |11.643%    |1.259         |1.614      |
 
-Since the underlying code uses `summary()` to compute the summaries, we can specify a particular credible level and the type of interval we want (e.g. highest posterior density):
+Since the underlying code uses `tidy()` to compute the summaries, we can specify a particular credible level and the type of interval we want (e.g. highest posterior density):
 
 ```R
-present_bbfit(fit, conf_level = 0.8, interval_type = "HPD", digits = 2)
+present_bbfit(fit, conf_level = 0.8, interval_type = "HPD")
 ```
 
 | Group 1| Group 2|Pr(Success) in Group 1  |Pr(Success) in Group 2  |Difference             |Relative Risk     |Odds Ratio        |
@@ -117,13 +140,27 @@ In Bayesian statistics, we can reuse a previously computed posterior as a prior 
 
 ```R
 fit_2 <- update(fit, x = c(100, 200), n = c(400, 600))
-present_bbfit(list("Day 1" = fit, "Day 2" = fit_2), digits = 2)
+present_bbfit(list("Day 1" = fit, "Day 2" = fit_2))
 ```
 
 |      | Group 1| Group 2|Pr(Success) in Group 1  |Pr(Success) in Group 2  |Difference             |Relative Risk     |Odds Ratio        |
 |:-----|-------:|-------:|:-----------------------|:-----------------------|:----------------------|:-----------------|:-----------------|
 |Day 1 |     350|     550|57.12% (51.88%, 62.29%) |45.48% (41.38%, 49.63%) |11.64% (4.96%, 18.30%) |1.26 (1.10, 1.43) |1.61 (1.22, 2.10) |
-|Day 2 |     750|    1150|39.96% (36.45%, 43.24%) |39.17% (36.23%, 42.01%) |0.78% (-3.73%, 5.08%)  |1.02 (0.91, 1.13) |1.04 (0.85, 1.24) |
+|Day 2 |     750|    1150|39.96% (36.45%, 43.24%) |39.18% (36.23%, 42.01%) |0.78% (-3.73%, 5.08%)  |1.02 (0.91, 1.13) |1.04 (0.85, 1.24) |
+
+If you *purrrfer*, you can achieve similar results the following way:
+
+```R
+list("1" = fit, "2" = fit_2) %>%
+  purrr::map_df(present_bbfit, raw = TRUE, .id = "Day") %>%
+  # ...other manipulations... %>%
+  knitr::kable()
+```
+
+|Day | Group 1| Group 2|Pr(Success) in Group 1  |Pr(Success) in Group 2  |Difference             |Relative Risk     |Odds Ratio        |
+|:---|-------:|-------:|:-----------------------|:-----------------------|:----------------------|:-----------------|:-----------------|
+|1   |     350|     550|57.12% (51.88%, 62.29%) |45.48% (41.38%, 49.63%) |11.64% (4.96%, 18.30%) |1.26 (1.10, 1.43) |1.61 (1.22, 2.10) |
+|2   |     750|    1150|39.96% (36.45%, 43.24%) |39.18% (36.23%, 42.01%) |0.78% (-3.73%, 5.08%)  |1.02 (0.91, 1.13) |1.04 (0.85, 1.24) |
 
 ## See also
 
