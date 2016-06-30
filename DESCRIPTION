@@ -1,7 +1,7 @@
 Package: BCDA
 Type: Package
 Title: Tools for Bayesian Categorical Data Analysis
-Version: 0.2.2
+Version: 0.2.3
 Authors@R: c(
     person("Mikhail", "Popov", email = "mpopov@wikimedia.org", role = c("cre", "aut")),
     person("Wikimedia Foundation", role = "cph"))
@@ -20,7 +20,8 @@ Suggests:
     coda,
     LearnBayes,
     conting,
-    ggthemes
+    ggthemes,
+    tibble
 URL: https://github.com/bearloga/BCDA
 BugReports: https://github.com/bearloga/BCDA/issues
 VignetteBuilder: knitr

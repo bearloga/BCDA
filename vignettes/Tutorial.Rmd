@@ -10,11 +10,12 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
-options(digits = 4)
+options(digits = 3)
+library(magrittr)
+library(tibble)
 library(ggplot2)
 library(ggthemes)
 theme_set(ggthemes::theme_tufte(base_family = "Gill Sans"))
-library(magrittr)
 ```
 
 The following table is from a report on the relationship between aspirin use and heart attacks by the Physicians' Health Study Research Group at Harvard Medical School. It was a 5-year randomized study of whether regular aspirin take reduces mortality from cardiovascular disease. Of the 11,034 physicians taking a placebo, 18 and 17 suffered fatal and non-fatal heart attacks, respectively. Of the 11,037 taking aspirin, 5 and 99 suffered fatal and non-fatal heart attacks, respectively.
@@ -160,8 +161,7 @@ set.seed(0)
 group_1 <- sample.int(2, 20, prob = c(0.55, 0.45), replace = TRUE)-1
 group_2 <- sample.int(2, 20, prob = c(0.65, 0.35), replace = TRUE)-1
 fit <- beta_binom(c(sum(group_1), sum(group_2)), c(length(group_1), length(group_2)))
-temp <- summary(fit); temp$term <- rownames(temp); rownames(temp) <- NULL; temp$day <- 1
-posterior_summaries <- temp
+posterior_summaries <- cbind(data_frame(day = 1, term = colnames(fit$posterior_simulations)), tidy(fit))
 ```
 
 ```{r bayesian_updating, fig.width = 7, fig.height = 4}
@@ -169,8 +169,10 @@ for (day in 2:14) {
   group_1 <- sample.int(2, 10, prob = c(0.55, 0.45), replace = TRUE)-1
   group_2 <- sample.int(2, 10, prob = c(0.65, 0.35), replace = TRUE)-1
   fit <- update(fit, c(sum(group_1), sum(group_2)), c(length(group_1), length(group_2)))
-  temp <- summary(fit); temp$term <- rownames(temp); rownames(temp) <- NULL; temp$day <- day
-  posterior_summaries <- rbind(posterior_summaries, temp)
+  posterior_summaries <- rbind(posterior_summaries,
+                               cbind(data_frame(day = day,
+                                                term = colnames(fit$posterior_simulations)),
+                                     tidy(fit)))
 }
 posterior_summaries$term <- factor(posterior_summaries$term,
                                    levels = c("p1", "p2", "prop_diff",

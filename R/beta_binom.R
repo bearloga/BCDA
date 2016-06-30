@@ -72,15 +72,22 @@ update.beta_binomial_fit <- function(object, x, n = NULL, n_sims = 1e3) {
   return(fit)
 }
 
-#' @title Summarize posterior draws from a fitted Beta-Binom model in a tidy form.
-#' @description Outputs a data frame of point estimates and Bayesian confidence
+#' @title Tidy the model into a summary data.frame
+#' @name tidy
+#' @rdname tidy
+#' @export
+#' @importFrom broom tidy
+NULL
+
+#' @description Summarize posterior draws from a fitted Beta-Binom model in a
+#'   tidy form. Outputs a data frame of point estimates and Bayesian confidence
 #'   intervals for group proportions, proportion difference, relative risk, and
 #'   odds ratio.
 #' @param x An object of class "beta_binomial_fit".
 #' @param conf_level Probability level for credible intervals. 95\% by default.
 #' @param interval_type Method for computing intervals ("quantile" or "HPD").
 #' @return A data frame consistent with the output of David Robinson's
-#'   \code{broom::tidyMCMC()} tidying method:
+#'   \code{\link[broom]{tidyMCMC}} tidying method:
 #'   \describe{
 #'     \item{estimate}{Point estimate (mean of posterior draws).}
 #'     \item{std.error}{Standard error.}
@@ -88,9 +95,9 @@ update.beta_binomial_fit <- function(object, x, n = NULL, n_sims = 1e3) {
 #'     \item{conf.high}{Credible interval upper bound.}
 #'   }
 #' @examples \dontrun{
-#' tidy(beta_binom(x = c(200, 250), n = c(350, 550)))
+#' tidy.beta_binomial_fit(beta_binom(x = c(200, 250), n = c(350, 550)))
 #' }
-#' @method tidy beta_binomial_fit
+#' @name tidy
 #' @export
 tidy.beta_binomial_fit <- function(x, conf_level = 0.95, interval_type = c("quantile", "HPD"), ...) {
   if (!requireNamespace("coda", quietly = TRUE) & interval_type[1] == "HPD") {
@@ -122,8 +129,8 @@ plot.beta_binomial_fit <- function(x, interval_type = c("quantile", "HPD")) {
 coda package to be installed. Defaulting to interval_type = "quantile"')
     interval_type <- "quantile"
   }
-  temp95 <- tidy(x, conf_level = 0.95, interval_type = interval_type)
-  temp80 <- tidy(x, conf_level = 0.80, interval_type = interval_type)
+  temp95 <- tidy.beta_binomial_fit(x, conf_level = 0.95, interval_type = interval_type)
+  temp80 <- tidy.beta_binomial_fit(x, conf_level = 0.80, interval_type = interval_type)
   temp95$term <- factor(rownames(temp95),
                         levels = c("p1", "p2", "prop_diff", "relative_risk", "odds_ratio"),
                         labels = c("Prop 1", "Prop 2", "Prop 1 - Prop 2", "Relative Risk", "Odds Ratio"))
@@ -211,7 +218,7 @@ present_bbfit <- function(object, conf_interval = TRUE, conf_level = 0.95, inter
     object <- list(object) # so that we can use lapply
   }
   posterior_summaries <- lapply(object, function(sub_object, conf_level, interval_type) {
-    posterior_summary <- tidy(sub_object)
+    posterior_summary <- tidy.beta_binomial_fit(sub_object)
     totals <- sub_object$totals
     return(list(ps = posterior_summary, t = totals))
   }, conf_level = conf_level, interval_type = interval_type)
@@ -251,7 +258,7 @@ present_bbfit <- function(object, conf_interval = TRUE, conf_level = 0.95, inter
 
 #' @export
 print.beta_binomial_fit <- function(x, ...) {
-  print(tidy(x))
+  print(tidy.beta_binomial_fit(x))
 }
 
 #' @export
