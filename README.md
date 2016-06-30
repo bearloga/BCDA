@@ -5,7 +5,7 @@ This is a set of tools for Bayesian analysis of categorical data, specifically 2
 Use:
 
 - `beta_binom()` for analysis using the Beta-Binomial model
-  - `print()`, `plot()`, and `summary()` to view the results
+  - `print()`, `tidy()`, `glance()`, and `plot()` to view the results
   - `present_bbfit()` if you want a nicely formatted table of summaries to include in a presentation or report
   - `update()` if you have additional data
 - `est_multinom()` for estimating multinomial cell probabilities
