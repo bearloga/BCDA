@@ -15,8 +15,8 @@ For more information, see the Tutorial vignette.
 ## Installing
 
 ```R
-install.packages("devtools")
-devtools::install_github("bearloga/BCDA")
+# install.packages("remotes")
+remotes::install_github("bearloga/BCDA")
 ```
 
 ## Usage
