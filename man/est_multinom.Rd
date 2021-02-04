@@ -22,15 +22,15 @@ The model assumes no margins are fixed. Two random binary outcomes
   outcomes with probabilities \eqn{p_{11}, p_{12}, p_{21}, p_{22}}.
 }
 \examples{
-data <- matrix(c(200, 150, 250, 300), nrow = 2, byrow = TRUE)
-colnames(data) <- c('Safe' ,'Dangerous')
-rownames(data) <- c('Animals', 'Plants')
-est_multinom(data)
+fake_data <- matrix(c(200, 150, 250, 300), nrow = 2, byrow = TRUE)
+colnames(fake_data) <- c('Safe' ,'Dangerous')
+rownames(fake_data) <- c('Animals', 'Plants')
+est_multinom(fake_data)
 
-est_multinom(x = data[, 'Safe'], n = margin.table(data, 1))
+est_multinom(x = c(200, 250), n = c(350, 550))
 
 hyperparams <- matrix(c(0.25, 0.2, 0.15, 0.4), nrow = 2, byrow = TRUE)
-est_multinom(data, prior = hyperparams)
+est_multinom(fake_data, prior = hyperparams)
 
 }
 \references{
@@ -38,4 +38,3 @@ Fienberg, S.E. and Holland, P.W. (1973) Simultaneous estimation
   of multinomial cell probabilities. \emph{Journal of the American Statistical
   Association}, \strong{68}, 683-691. doi:10.1080/01621459.1973.10481405
 }
-

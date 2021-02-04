@@ -1,4 +1,10 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^man-roxygen$
+^data-raw$
+^cran-comments\.md$
+^README.Rmd
 ^CONDUCT\.md$
-^inst/.*$
+^figures/.*$
+^updating.gif$
+^README\.Rmd$
