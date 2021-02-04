@@ -2,10 +2,14 @@
 % Please edit documentation in R/beta_binom.R
 \name{beta_binom}
 \alias{beta_binom}
-\title{Binomial Model with Beta Priors}
+\title{Fit a Binomial model with Beta priors}
 \usage{
-beta_binom(x, n = NULL, prior = c(a = 0.5, b = 0.5, c = 0.5, d = 0.5),
-  n_sims = 10000)
+beta_binom(
+  x,
+  n = NULL,
+  prior = c(a = 0.5, b = 0.5, c = 0.5, d = 0.5),
+  n_sims = 10000
+)
 }
 \arguments{
 \item{x}{A numeric vector of success counts OR a 2x2 table or matrix.}
@@ -22,7 +26,8 @@ An S3 object of class "beta_binomial_fit". It has the following
   properties: posterior_simulations, posterior_parameters, successes, totals
 }
 \description{
-
+Fits a Beta-Binomial model to a 2x2 table/matrix of two groups
+  and two outcomes/features.
 }
 \details{
 The model assumes
@@ -31,14 +36,10 @@ The model assumes
   corresponds to a Jeffreys prior on \eqn{p_1} and \eqn{p_2}.
 }
 \examples{
-\dontrun{
-data <- matrix(c(200, 150, 250, 300), nrow = 2, byrow = TRUE)
-colnames(data) <- c('Safe' ,'Dangerous')
-rownames(data) <- c('Animals', 'Plants')
-
-beta_binom(data)
+fake_data <- matrix(c(200, 150, 250, 300), nrow = 2, byrow = TRUE)
+colnames(fake_data) <- c('Safe' ,'Dangerous')
+rownames(fake_data) <- c('Animals', 'Plants')
+beta_binom(fake_data)
 
 beta_binom(x = c(200, 250), n = c(350, 550))
 }
-}
-

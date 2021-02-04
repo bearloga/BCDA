@@ -4,9 +4,15 @@
 \alias{present_bbfit}
 \title{Present the summarized posterior results of the Beta-Binomial model}
 \usage{
-present_bbfit(object, conf_interval = TRUE, conf_level = 0.95,
-  interval_type = c("quantile", "HPD"), raw = FALSE, fancy_names = TRUE,
-  ...)
+present_bbfit(
+  object,
+  conf_interval = TRUE,
+  conf_level = 0.95,
+  interval_type = c("quantile", "HPD"),
+  raw = FALSE,
+  fancy_names = TRUE,
+  ...
+)
 }
 \arguments{
 \item{object}{An object of class "beta_binomial_fit" or a list (named or
@@ -49,11 +55,11 @@ Outputs a nicely-formatted table suitable for presentations and
 }
 \examples{
 \dontrun{
-data <- matrix(c(200, 150, 250, 300), nrow = 2, byrow = TRUE)
-colnames(data) <- c('Safe' ,'Dangerous')
-rownames(data) <- c('Animals', 'Plants')
+fake_data <- matrix(c(200, 150, 250, 300), nrow = 2, byrow = TRUE)
+colnames(fake_data) <- c('Safe' ,'Dangerous')
+rownames(fake_data) <- c('Animals', 'Plants')
 
-fit <- beta_binom(data)
+fit <- beta_binom(fake_data)
 present_bbfit(fit) # uses getOption("digits")
 present_bbfit(fit, digits = 2)
 present_bbfit(fit, conf_interval = FALSE, digits = 3)
@@ -65,4 +71,3 @@ fit_4 <- update(fit_3, x = c(20, 13), n = c(80, 45))
 present_bbfit(list("Day 1" = fit, "Day 2" = fit_2, "Day 3" = fit_3, "Day 4" = fit_4), digits = 2)
 }
 }
-

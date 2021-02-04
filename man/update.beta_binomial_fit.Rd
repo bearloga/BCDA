@@ -4,7 +4,7 @@
 \alias{update.beta_binomial_fit}
 \title{Update the Beta-Binomial model posterior with new data}
 \usage{
-\method{update}{beta_binomial_fit}(object, x, n = NULL, n_sims = 1000)
+\method{update}{beta_binomial_fit}(object, x, n = NULL, n_sims = 1000, ...)
 }
 \arguments{
 \item{object}{An object of class "beta_binomial_fit".}
@@ -27,12 +27,11 @@ Uses the previously computed Beta posterior as prior to compute
 }
 \examples{
 \dontrun{
-data <- matrix(c(200, 150, 250, 300), nrow = 2, byrow = TRUE)
-colnames(data) <- c('Safe' ,'Dangerous')
-rownames(data) <- c('Animals', 'Plants')
+fake_data <- matrix(c(200, 150, 250, 300), nrow = 2, byrow = TRUE)
+colnames(fake_data) <- c('Safe' ,'Dangerous')
+rownames(fake_data) <- c('Animals', 'Plants')
 
-fit <- beta_binom(data)
+fit <- beta_binom(fake_data)
 fit <- update(fit, x = c(100, 200), n = c(400, 600))
 }
 }
-

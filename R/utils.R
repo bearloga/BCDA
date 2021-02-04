@@ -1,5 +1,5 @@
 # Used in beta_binom and update.beta_binomial_fit
-check_inputs <- function(x, n) {
+check_inputs <- function(x, n = NULL) {
   if (is.null(n)) {
     if (is.vector(x)) {
       stop("without n, x must be a 2x2 matrix or table")
@@ -64,9 +64,8 @@ make_table <- function(df) {
     stop("object must be a data.frame")
   }
   output <- as.table(as.matrix(as.data.frame(df[, -1])))
-  colnames(output) <- names(df[, -1])
+  colnames(output) <- colnames(df[, -1])
   rownames(output) <- as.character(df[[1]])
-  dimnames(output) <- c(names(df)[1], "Outcome")
   return(output)
 }
 #' @param x A 2-by-2 table produced by \code{make_table()}, \code{table()}, or

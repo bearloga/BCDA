@@ -1,29 +1,37 @@
 Package: BCDA
 Type: Package
 Title: Tools for Bayesian Categorical Data Analysis
-Version: 0.2.3
+Version: 0.4.0
+Date: 2021-02-04
 Authors@R: c(
     person("Mikhail", "Popov", email = "mpopov@wikimedia.org", role = c("cre", "aut")),
     person("Wikimedia Foundation", role = "cph"))
 Description: A toolkit for Bayesian analysis of 2x2 categorical data, such as
     results of A/B tests.
 License: MIT + file LICENSE
-LazyData: TRUE
+URL: https://github.com/bearloga/BCDA
+BugReports: https://github.com/bearloga/BCDA/issues
 Depends:
     R (>= 3.0.2)
 Imports:
+    dplyr (>= 1.0.0),
+    generics (>= 0.1.0),
     ggplot2 (>= 2.0.0),
-    broom
+    magrittr,
+    purrr,
+    tibble,
+    tidyr (>= 1.0.0)
 Suggests:
-    knitr,
-    rmarkdown,
     coda,
-    LearnBayes,
     conting,
-    ggthemes,
-    purrr
-URL: https://github.com/bearloga/BCDA
-BugReports: https://github.com/bearloga/BCDA/issues
+    ggdist,
+    gt,
+    hrbrthemes,
+    knitr,
+    LearnBayes,
+    rmarkdown,
+    testthat
+LazyData: TRUE
 VignetteBuilder: knitr
 Collate:
     'BCDA.R'
@@ -31,4 +39,5 @@ Collate:
     'beta_binom.R'
     'est_multinom.R'
     'utils.R'
-RoxygenNote: 5.0.1
+Encoding: UTF-8
+RoxygenNote: 7.1.1
